@@ -6,8 +6,10 @@ import Groq from "groq-sdk";
 dotenv.config();
 
 const app = express();
+
 app.use(express.json());
-app.use(cors({origin:"*"}));
+app.use(cors());
+app.options("*", cors()); // fix preflight
 
 const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY,
