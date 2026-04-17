@@ -21,45 +21,37 @@ app.get("/", (req, res) => {
 app.post("/chat", async (req, res) => {
   console.log("Incoming:", req.body);
 
-  try {
-    const { message, role } = req.body;
+ try {
+  const { message, role } = req.body;
 
-    const prompt = `
+  const prompt = `
 You are a professional networking coach.
 
-IMPORTANT RULES:
-- Do NOT generate fake names or fake LinkedIn profiles
-- Only give guidance, steps, and suggestions
-
 Role: ${role}
-
 User: ${message}
 `;
 
-    const chatCompletion = await groq.chat.completions.create({
-      messages: [
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
-      model: "llama-3.1-8b-instant",
-    });
+  const chatCompletion = await groq.chat.completions.create({
+    messages: [
+      { role: "user", content: prompt }
+    ],
+    model: "llama-3.1-8b-instant",
+  });
 
-    const reply =
-      chatCompletion.choices?.[0]?.message?.content ||
-      "No response from AI";
+  const reply =
+    chatCompletion?.choices?.[0]?.message?.content ||
+    "No response from AI";
 
-    res.json({ reply });
+  res.json({ reply });
 
-  } catch (error) {
-    console.error("FULL ERROR:", error);
-    res.status(500).json({ reply: "Error generating response" });
-  }
+} catch (error) {
+  console.error("FULL ERROR:", error);
+  res.status(500).json({ reply: error.message });
+}
 });
 
 const PORT = process.env.PORT || 3000;
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
-});
+}); 
