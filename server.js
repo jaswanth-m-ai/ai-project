@@ -7,7 +7,7 @@ dotenv.config();
 
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(cors({origin:"*"}));
 
 const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY,
@@ -17,32 +17,22 @@ const groq = new Groq({
 app.get("/", (req, res) => {
   res.send("Server running 🚀");
 });
-
-// Chat route
 app.post("/chat", async (req, res) => {
-  console.log("Incoming request:", req.body);
+  console.log("Incoming:", req.body);
 
   try {
-    const { message, history } = req.body;
+    const { message, role } = req.body;
 
-    const conversation = history?.length
-      ? history.map(m => `${m.role}: ${m.content}`).join("\n")
-      : "No previous conversation";
-
-   const prompt = `
+    const prompt = `
 You are a professional networking coach.
 
 IMPORTANT RULES:
 - Do NOT generate fake names or fake LinkedIn profiles
-- Do NOT claim real people unless verified
-- Only provide guidance and steps
+- Only give guidance, steps, and suggestions
 
 Role: ${role}
 
 User: ${message}
-
-If user asks for people or contacts:
-→ Guide them how to find real professionals using LinkedIn, events, etc.
 `;
 
     const chatCompletion = await groq.chat.completions.create({
@@ -57,12 +47,12 @@ If user asks for people or contacts:
 
     const reply =
       chatCompletion?.choices?.[0]?.message?.content ||
-      "Sorry, I couldn't generate a response.";
+      "No response from AI";
 
     res.json({ reply });
 
   } catch (error) {
-    console.error("ERROR:", error);
+    console.error("FULL ERROR:", error);
     res.status(500).json({ reply: "Error generating response" });
   }
 });
