@@ -9,7 +9,6 @@ const app = express();
 
 app.use(express.json());
 app.use(cors());
-app.options("*", cors()); // fix preflight
 
 const groq = new Groq({
   apiKey: process.env.GROQ_API_KEY,
