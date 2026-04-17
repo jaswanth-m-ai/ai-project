@@ -46,7 +46,7 @@ User: ${message}
     });
 
     const reply =
-      chatCompletion?.choices?.[0]?.message?.content ||
+      chatCompletion.choices?.[0]?.message?.content ||
       "No response from AI";
 
     res.json({ reply });
